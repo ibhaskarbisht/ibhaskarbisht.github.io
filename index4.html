@@ -1,0 +1,129 @@
+<html>
+
+<head>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: arial;
+        }
+        #main{
+            display:flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
+        }
+
+        #heading {
+            color: white;
+            background-color: blue;
+            text-align: center;
+            line-height: 60px;
+        }
+        button{
+            background-color:red;
+            color:white;
+            border-radius:10%;
+            border:0px;
+            padding:10px;
+        }
+        input{
+            margin: 25px;
+            width:200px;
+        }
+    </style>
+    <script src="ocrad.js"></script>
+    <script>
+        function OCRImage(image) {
+            var canvas = document.createElement('canvas')
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            canvas.getContext('2d').drawImage(image, 0, 0)
+            return OCRAD(canvas)
+        }
+
+        function OCRPath(url, callback) {
+            var image = new Image()
+            image.src = url;
+            image.onload = function () { callback(OCRImage(image)) }
+        }
+
+        function OCRFile(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function () { OCRPath(reader.result, callback); }
+            reader.readAsDataURL(file)
+        }
+
+    </script>
+    
+        <div id="heading">
+            <h2>Image Processing - Find Complex words from Image</h2>
+        </div>
+        <div id="main">
+            <input type="text" id="userid" placeholder="Enter your UserID...">
+        <input type="file" id="inputfile">
+        <button id="submit" onclick="OCRFile(  document.getElementById('inputfile').files[0], function(text){      
+            var mydata = text;
+            // document.write(mydata);
+            let database;
+            fetch('db.txt')
+  .then( function (response){
+      return response.text();
+  })
+  .then(function (data){
+     database = data;
+
+  var b = database.split(' ');
+
+  var ans = [];
+  for(var i =0;i<b.length;i++){
+      if(mydata.search(b[i])>-1)
+      {
+          if(b[i]!=' ')
+          ans.push(b[i]);
+      }
+  }
+//  alert(ans);
+
+
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+  document.body.removeChild(element);
+}
+var userid = document.getElementById('userid').value;
+// alert(userid);
+if((ans.length)<=1) {
+
+    alert('No complex words found');
+}
+else{
+    download('yourfile.txt' ,ans);
+}
+
+// document.write(ans.length);
+  });
+
+
+
+
+
+ })">Submit</button>
+
+    </div>
+
+
+</body>
+
+</html>
